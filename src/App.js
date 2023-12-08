@@ -1,14 +1,34 @@
+// App.js
 import React from 'react';
-import LoginForm from './LoginForm';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import LoginForm from './components/LoginForm';
+import ForgotPasswordForm from './components/ForgotPasswordForm';
+import RegisterForm from './components/RegisterForm';
 
-const App = () => {
+function App() {
   return (
-    <div className="root">
-      <h1 style={{ textAlign: 'center' }}>Welcome to My React App</h1>
-      <LoginForm />
-    </div>
+    <Router>
+      <div style={styles.container}>
+        <Routes>
+          <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/" element={<LoginForm />} />
+        </Routes>
+      </div>
+    </Router>
   );
+}
+
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+  }
 };
 
 export default App;
+
 

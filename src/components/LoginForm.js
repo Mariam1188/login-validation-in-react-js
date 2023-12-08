@@ -1,25 +1,39 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import ForgotPasswordForm from './ForgotPasswordForm';
+import RegisterForm from './RegisterForm';
 
 
-
-const LoginForm = () => {
+function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const validateLogin = () => {
-   
-    const validUsername = "user";
-    const validPassword = "pass";
+  async function validateLogin() {
 
-    if (username === validUsername && password === validPassword) {
-      console.log("Login successful!");
-      setError('');
-    } else {
-      setError("Invalid username or password. Please try again.");
+    try {
+
+      const response = await fetch("https://example.com/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        console.log("Login successful!");
+        setError("");
+      } else {
+        const data = await response.json();
+        setError(data.message || "Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.log("Error during login:", error);
+      setError("An unexpected error occurred. Please try again later.");
     }
-  };
+  }
 
   return (
     <div style={styles.container}>
@@ -34,10 +48,19 @@ const LoginForm = () => {
         <button type="button" onClick={validateLogin} style={styles.button}>Login</button>
 
         {error && <p style={styles.error}>{error}</p>}
+
+        <div style={styles.additionalLinks}>
+          <p>
+            <Link to="/forgot-password">Forgot your password?</Link>
+          </p>
+          <p>
+            Don't have an account? <Link to="/register">Register here</Link>
+          </p>
+        </div>
       </form>
     </div>
   );
-};
+}
 
 const styles = {
   container: {
