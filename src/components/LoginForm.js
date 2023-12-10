@@ -3,12 +3,16 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import ForgotPasswordForm from './ForgotPasswordForm';
 import RegisterForm from './RegisterForm';
+import Form from './Form';
 
 
 function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isForgotPasswordVisible, setIsForgotPasswordVisible] = useState(false);
+  const [isRegisterVisible, setIsRegisterVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function validateLogin() {
 
@@ -32,12 +36,22 @@ function LoginForm() {
     } catch (error) {
       console.log("Error during login:", error);
       setError("An unexpected error occurred. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
+  }
+
+  function handleForgotPasswordClick() {
+    setIsForgotPasswordVisible(true);
+  }
+
+  function handleRegisterClick() {
+    setIsRegisterVisible(true);
   }
 
   return (
     <div style={styles.container}>
-      <form style={styles.form}>
+      <Form onSubmit={validateLogin} style={styles.form} isVisible={!isForgotPasswordVisible}>
         <h2 style={styles.header}>Login</h2>
         <label htmlFor="username" style={styles.label}>Username:</label>
         <input type="text" id="username" value={username} onChange={(e) => setUsername(e.target.value)} style={styles.input} required />
@@ -45,19 +59,24 @@ function LoginForm() {
         <label htmlFor="password" style={styles.label}>Password:</label>
         <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} style={styles.input} required />
 
-        <button type="button" onClick={validateLogin} style={styles.button}>Login</button>
+        <button type="submit" style={styles.button} disabled={isLoading}>
+          {isLoading ? "Logging in..." : "Login"}
+        </button>
 
         {error && <p style={styles.error}>{error}</p>}
-
         <div style={styles.additionalLinks}>
           <p>
-            <Link to="/forgot-password">Forgot your password?</Link>
+            <Link to="#" onClick={handleForgotPasswordClick}>
+              Forgot your password?
+            </Link>
           </p>
           <p>
-            Don't have an account? <Link to="/register">Register here</Link>
+            Don't have an account? <Link to="#" onClick={handleRegisterClick}>Register here</Link>
           </p>
         </div>
-      </form>
+      </Form>
+      {isForgotPasswordVisible && <ForgotPasswordForm onClose={() => setIsForgotPasswordVisible(false)} />}
+      {isRegisterVisible && <RegisterForm onClose={() => setIsRegisterVisible(false)} />}
     </div>
   );
 }

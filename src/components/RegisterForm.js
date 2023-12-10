@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import Form from './Form';
 
-function RegisterForm() {
+function RegisterForm({ onClose, isVisible }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -17,9 +18,18 @@ function RegisterForm() {
         }
     }
 
+    function handleSubmit(e) {
+        e.preventDefault();
+        handleRegister();
+    
+        if (!errorMessage) {
+            onClose();
+        }
+    }
+
     return (
         <div style={styles.container}>
-            <form style={styles.form}>
+            <Form onSubmit={handleSubmit} style={styles.form} isVisible={isVisible}>
                 <h2 style={styles.header}>Register</h2>
                 <label htmlFor="username" style={styles.label}>
                     Username:
@@ -57,13 +67,13 @@ function RegisterForm() {
                     required
                 />
 
-                <button type="button" onClick={handleRegister} style={styles.button}>
+                <button type="submit" style={styles.button}>
                     Register
                 </button>
 
                 {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
                 {errorMessage && <p style={styles.error}>{errorMessage}</p>}
-            </form>
+            </Form>
         </div>
     );
 }

@@ -1,24 +1,46 @@
 import React, { useState } from 'react';
-
+import Form from './Form';
 
 function ForgotPasswordForm() {
     const [email, setEmail] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [isVisible, setIsVisible] = useState(true);
 
-    function handleForgotPassword() {
-        if (email) {
-            setSuccessMessage(`Instructions to reset the password sent to ${email}`);
-            setErrorMessage("");
-        } else {
-            setErrorMessage("Please provide a valid email address.");
+    async function handleForgotPassword() {
+        try {
+            const response = await fetch("https://example.com/api/forgot-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            if (response.ok) {
+                setSuccessMessage(`Instructions to reset the password sent to ${email}`);
+                setErrorMessage("");
+                setIsVisible(false); 
+            } else {
+                const data = await response.json();
+                setErrorMessage(data.message || "Password reset failed. Please try again.");
+                setSuccessMessage('');
+            }
+        } catch (error) {
+            console.log("Error during forgot password:", error);
+            setErrorMessage("An unexpected error occurred. Please try again later.");
             setSuccessMessage("");
         }
     }
 
+    function handleSubmit(e) {
+        e.preventDefault();
+        handleForgotPassword();
+    }
+
     return (
         <div style={styles.container}>
-            <form style={styles.form}>
+            <Form onSubmit={handleSubmit} style={styles.form} isVisible={isVisible}>
                 <h2 style={styles.header}>Forgot Password</h2>
                 <label htmlFor="email" style={styles.label}>
                     Email:
@@ -32,13 +54,13 @@ function ForgotPasswordForm() {
                     required
                 />
 
-                <button type="button" onClick={handleForgotPassword} style={styles.button}>
+                <button type="submit" style={styles.button}>
                     Reset Password
                 </button>
 
                 {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
                 {errorMessage && <p style={styles.error}>{errorMessage}</p>}
-            </form>
+            </Form>
         </div>
     );
 }
